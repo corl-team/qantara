@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control</title>
+  <meta name="description" content="Qantara: one JEPA checkpoint that serves latent planning, behaviour cloning, and inverse dynamics. 91.2 SR on the LeWM control suite, new SOTA on OGBench-Cube. ICML 2026 DEMO Workshop.">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Qantara: Multi-Paradigm JEPA Control">
+  <meta property="og:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta property="og:url" content="https://corl-team.github.io/qantara/">
+  <meta property="og:image" content="https://corl-team.github.io/qantara/static/social.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="Qantara: one JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Qantara: Multi-Paradigm JEPA Control">
+  <meta name="twitter:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta name="twitter:image" content="https://corl-team.github.io/qantara/static/social.png">
+  <meta name="twitter:image:alt" content="Qantara: one JEPA checkpoint, three inference paradigms.">
+
+  <style>
+    :root{
+      --bg:#ffffff; --fg:#1b1c1e; --muted:#5b6570; --line:#e4e8ec;
+      --band:#eef2f5; --card:#f6f8fa; --accent:#2e6e8e; --accent2:#b5623f;
+      --maxw:920px;
+    }
+    :root[data-theme="dark"]{
+      --bg:#0d1117; --fg:#e6edf3; --muted:#9aa7b3; --line:#232b35;
+      --band:#12181f; --card:#161b22; --accent:#5aa9cd; --accent2:#e08b63;
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        --bg:#0d1117; --fg:#e6edf3; --muted:#9aa7b3; --line:#232b35;
+        --band:#12181f; --card:#161b22; --accent:#5aa9cd; --accent2:#e08b63;
+      }
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.65; font-size:17px; -webkit-font-smoothing:antialiased;
+    }
+    a{ color:var(--accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+    .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 1.25rem; }
+
+    /* ---- Header band ---- */
+    header{ background:var(--band); border-bottom:1px solid var(--line); padding:3rem 0 2.25rem; text-align:center; }
+    .logo{ width:190px; height:auto; margin:0 auto .4rem; display:block; }
+    :root[data-theme="dark"] .logo, .dark-logo{ }
+    @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .logo{ filter:invert(1) hue-rotate(180deg) brightness(1.05); } }
+    :root[data-theme="dark"] .logo{ filter:invert(1) hue-rotate(180deg) brightness(1.05); }
+    :root[data-theme="light"] .logo{ filter:none; }
+
+    h1.title{ font-size:2.5rem; letter-spacing:-.02em; margin:.3rem 0 .1rem; }
+    .subtitle{ font-size:1.28rem; font-weight:600; color:var(--fg); margin:.1rem 0 1rem; opacity:.92; }
+    .authors{ font-size:1.05rem; margin:.5rem 0 .15rem; }
+    .authors a{ color:var(--fg); }
+    .affil{ color:var(--muted); font-size:.98rem; }
+    .venue{ font-style:italic; color:var(--muted); margin:.5rem 0 1.4rem; font-size:1rem; }
+
+    /* ---- Link bar ---- */
+    nav.links{ display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
+    nav.links a{
+      display:inline-flex; align-items:center; gap:.45rem;
+      padding:.55rem 1.1rem; border-radius:999px; font-weight:600; font-size:.95rem;
+      background:var(--fg); color:var(--bg);
+      border:1px solid var(--fg); transition:opacity .15s;
+    }
+    nav.links a:hover{ opacity:.82; text-decoration:none; }
+    nav.links a .ico{ font-size:1.05em; line-height:1; }
+
+    /* ---- Sections ---- */
+    section{ padding:2.4rem 0 .4rem; }
+    h2{ font-size:1.6rem; letter-spacing:-.01em; margin:.2rem 0 1rem; text-align:center; }
+    h2 .em{ margin-right:.45rem; }
+    p{ margin:0 0 1rem; }
+    .lead{ text-align:justify; }
+
+    /* ---- Highlight numbers ---- */
+    .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:1.5rem 0 .5rem; }
+    .stat{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1.15rem 1rem; text-align:center; }
+    .stat .big{ font-size:2rem; font-weight:800; color:var(--accent); letter-spacing:-.02em; }
+    .stat .lbl{ font-size:.86rem; color:var(--muted); margin-top:.2rem; line-height:1.35; }
+    @media (max-width:640px){ .stats{ grid-template-columns:1fr; } h1.title{ font-size:2rem; } }
+
+    /* ---- Figures ---- */
+    figure{ margin:1.6rem 0; text-align:center; }
+    figure img, figure video{ max-width:100%; height:auto; border-radius:10px; border:1px solid var(--line); background:#fff; }
+    figcaption{ color:var(--muted); font-size:.9rem; margin-top:.7rem; text-align:left; }
+    figcaption b{ color:var(--fg); }
+
+    /* ---- Table ---- */
+    .tblwrap{ overflow-x:auto; margin:1.4rem 0; }
+    table{ border-collapse:collapse; width:100%; font-size:.96rem; }
+    th,td{ padding:.6rem .8rem; border-bottom:1px solid var(--line); text-align:center; }
+    th:first-child,td:first-child{ text-align:left; }
+    thead th{ border-bottom:2px solid var(--fg); font-weight:700; }
+    tbody tr.ours{ background:var(--card); font-weight:700; }
+    tbody tr.ours td:first-child{ color:var(--accent); }
+    .note{ color:var(--muted); font-size:.86rem; }
+
+    /* ---- Paradigm cards ---- */
+    .paradigms{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:1.3rem 0; }
+    .pcard{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:1.1rem 1.15rem; }
+    .pcard h3{ margin:.1rem 0 .35rem; font-size:1.05rem; }
+    .pcard p{ margin:0; font-size:.92rem; color:var(--muted); }
+    @media (max-width:640px){ .paradigms{ grid-template-columns:1fr; } }
+
+    /* ---- BibTeX ---- */
+    pre.bib{
+      background:var(--card); border:1px solid var(--line); border-radius:12px;
+      padding:1.1rem 1.2rem; overflow-x:auto; font-size:.86rem; line-height:1.55;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--fg);
+    }
+
+    footer{ border-top:1px solid var(--line); margin-top:2.5rem; padding:1.6rem 0 2.6rem; text-align:center; color:var(--muted); font-size:.9rem; }
+
+    /* theme toggle */
+    .toggle{ position:fixed; top:12px; right:14px; z-index:9;
+      background:var(--card); border:1px solid var(--line); color:var(--fg);
+      border-radius:999px; width:38px; height:38px; cursor:pointer; font-size:1.1rem; line-height:1; }
+
+    /* ---- Mobile refinements ---- */
+    @media (max-width:640px){
+      body{ font-size:16px; overflow-wrap:break-word; }
+      header{ padding:2.2rem 0 1.8rem; }
+      .logo{ width:150px; }
+      h1.title{ font-size:1.9rem; }
+      .subtitle{ font-size:1.08rem; }
+      .authors{ font-size:.98rem; }
+      h2{ font-size:1.35rem; }
+      section{ padding:1.9rem 0 .3rem; }
+      .lead{ text-align:left; }               /* justify looks ragged on narrow screens */
+      .stat .big{ font-size:1.7rem; }
+      nav.links a{ padding:.5rem .9rem; font-size:.9rem; }
+      pre.bib{ font-size:.78rem; }
+      .toggle{ top:8px; right:8px; width:34px; height:34px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark">◐</button>
+
+  <header>
+    <div class="wrap">
+      <svg class="logo" viewBox="-12 -10 184 88" fill="none" aria-label="Qantara logo">
+        <g stroke="#2E6E8E" stroke-width="0.8" opacity="0.8" stroke-linecap="round">
+          <line x1="50" y1="9" x2="10" y2="64"/><line x1="50" y1="14" x2="20" y2="64"/><line x1="50" y1="19" x2="29" y2="64"/><line x1="50" y1="24" x2="37" y2="64"/>
+          <line x1="50" y1="9" x2="79" y2="64"/><line x1="50" y1="14" x2="71" y2="64"/><line x1="50" y1="19" x2="63" y2="64"/><line x1="50" y1="24" x2="56" y2="64"/>
+          <line x1="110" y1="9" x2="81" y2="64"/><line x1="110" y1="14" x2="89" y2="64"/><line x1="110" y1="19" x2="97" y2="64"/><line x1="110" y1="24" x2="104" y2="64"/>
+          <line x1="110" y1="9" x2="150" y2="64"/><line x1="110" y1="14" x2="140" y2="64"/><line x1="110" y1="19" x2="131" y2="64"/><line x1="110" y1="24" x2="123" y2="64"/>
+        </g>
+        <g stroke="#1B1C1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M43 64 L50 33 L57 64"/><line x1="50" y1="33" x2="50" y2="5"/><line x1="45.3" y1="54" x2="54.7" y2="54"/><line x1="47.5" y1="44" x2="52.5" y2="44"/>
+          <path d="M103 64 L110 33 L117 64"/><line x1="110" y1="33" x2="110" y2="5"/><line x1="105.3" y1="54" x2="114.7" y2="54"/><line x1="107.5" y1="44" x2="112.5" y2="44"/>
+        </g>
+        <line x1="4" y1="64" x2="156" y2="64" stroke="#1B1C1E" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+
+      <h1 class="title">Qantara</h1>
+      <div class="subtitle">Bridge-Flow Training for Multi-Paradigm JEPA Control</div>
+
+      <div class="authors">
+        Ruslan Rakhimov &nbsp;·&nbsp; George Bredis &nbsp;·&nbsp; Yuriy Maksyuta &nbsp;·&nbsp; Daniil Gavrilov
+      </div>
+      <div class="venue">ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO)</div>
+
+      <nav class="links">
+        <a href="https://arxiv.org/abs/2607.04978"><span class="ico">📄</span> Paper</a>
+        <a href="https://github.com/corl-team/qantara"><span class="ico">💻</span> Code</a>
+        <a href="https://huggingface.co/t-tech/qantara-checkpoints"><span class="ico">🤗</span> Checkpoints</a>
+        <a href="https://huggingface.co/papers/2607.04978"><span class="ico">🤗</span> HF Paper</a>
+        <a href="https://x.com/rusrakhimov/status/2074847486288806306"><span class="ico">🧵</span> Thread</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+
+    <!-- Abstract -->
+    <section id="abstract">
+      <h2><span class="em">📝</span>Abstract</h2>
+      <p class="lead">Joint-Embedding Predictive Architectures (JEPAs) underpin a growing family of latent world
+      models for control from raw pixels, but every existing JEPA world model commits at training time to a
+      single inference paradigm: either trajectory optimisation in a learned dynamics model, or direct
+      behaviour cloning. A single checkpoint that serves both would defer this choice to inference, when
+      deployment constraints (rollout cost, observation accessibility) determine which path wins. We present
+      <b>Qantara</b>, an end-to-end JEPA whose joint training objective pairs a Brownian-bridge interpolant
+      between consecutive clean latents on the state axis with noise-to-data flow matching on the action axis.
+      The same checkpoint serves three inference paradigms without retraining: latent planning, behaviour-cloning
+      action sampling, and inverse dynamics, which we query through a video–inverse composition that first
+      predicts the next latent without action conditioning, then extracts the action. Training concentrates mass
+      on the edges of the (action-time, state-time) noise square, where inference queries the predictor: replacing
+      it with uniform interior sampling drops Push-T planning from 90.1 to 53.3 SR at matched compute. On the LeWM
+      control suite, Qantara reaches a 91.2 SR three-train-seed average and sets new SOTA on OGBench-Cube (+7.7 SR
+      over DINO-WM, +19.7 over LeWM). From the same weights, the behaviour-cloning and video–inverse paths reach
+      82–83 SR on Push-T and 71–73 SR on Cube. These results move JEPA world models from single-paradigm planners
+      to multi-paradigm controllers.</p>
+    </section>
+
+    <!-- Method -->
+    <section id="method">
+      <h2><span class="em">⚙️</span>Method</h2>
+      <p>Qantara trains a single causal transformer over interleaved <b>action</b> and <b>latent-state</b>
+      tokens. On the state axis it learns a <b>Brownian-bridge interpolant</b> between consecutive clean latents;
+      on the action axis it learns <b>noise-to-data flow matching</b>. The two noise levels
+      (τ<sup>a</sup>, τ<sup>z</sup>) are sampled on the <b>edges</b> of the unit square, exactly the edges each
+      inference paradigm queries at test time. The interior of the square is never used.</p>
+      <figure>
+        <img src="static/method.png" alt="Qantara training scheme and edge-aligned noise sampling square">
+        <figcaption><b>Left:</b> the model attends causally across time and bidirectionally within each
+        (action, latent) block, denoising noisy inputs toward clean action/latent heads.
+        <b>Right:</b> edge-aligned (τ<sup>a</sup>, τ<sup>z</sup>) sampling. Each edge of the square corresponds to
+        one inference query (<i>policy</i> for BC, <i>video</i>, <i>forward</i> for planning, <i>inverse</i>, and the
+        <i>joint</i> diagonal), so training mass lands precisely where inference reads the predictor.</figcaption>
+      </figure>
+      <figure>
+        <video src="static/noise_square.mp4" autoplay loop muted playsinline
+               aria-label="Animation: training samples condense from uniform interior onto the five edge loci; Push-T planning success rises from 53.3 to 90.1"></video>
+        <figcaption><b>Where training samples the denoising times.</b> Condensing training mass from uniform
+        interior sampling (53.3 SR on Push-T planning) onto the five inference loci (90.1 SR) at matched
+        compute.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Three paradigms -->
+    <section id="paradigms">
+      <h2><span class="em">🎛️</span>One Checkpoint, Three Paradigms</h2>
+      <p>Because deployment constraints (rollout budget, whether goal observations are available) differ at
+      test time, Qantara defers the choice of inference path to inference. The same weights serve:</p>
+      <div class="paradigms">
+        <div class="pcard"><h3>① Latent planning</h3><p>CEM trajectory optimisation in the learned latent
+          dynamics, the headline goal-conditioned planner.</p></div>
+        <div class="pcard"><h3>② Behaviour cloning</h3><p>Goal-blind action sampling straight from the policy
+          head: no rollout, cheapest inference.</p></div>
+        <div class="pcard"><h3>③ Video–inverse</h3><p>Predict the next latent without action conditioning, then
+          extract the action via inverse dynamics.</p></div>
+      </div>
+      <figure>
+        <video src="static/triptych_pusht.mp4" autoplay loop muted playsinline
+               aria-label="Push-T: real trajectory next to three decoded latent rollouts (plan, clone, inverse) from the same checkpoint"></video>
+        <figcaption><b>Push-T, 16-step decoded rollouts.</b> From a single held-out context frame, the same
+        checkpoint imagines the trajectory under the CEM forward primitive (PLAN), policy-head BC action
+        sampling (CLONE), and video-inverse action extraction (INVERSE); REAL is the ground-truth episode.
+        PLAN/CLONE/INVERSE tiles are decoded latents, not env renders.</figcaption>
+      </figure>
+    </section>
+
+    <!-- Results -->
+    <section id="results">
+      <h2><span class="em">📊</span>Results</h2>
+      <p>On the LeWM goal-conditioned planning suite, Qantara's latent planner reaches a <b>91.2 SR</b>
+      three-train-seed average and sets new state of the art on Cube and Reacher.</p>
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr><th>Method</th><th>Push-T</th><th>Two-Room</th><th>Cube</th><th>Reacher</th><th>Avg</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PLDM</td><td>78.0</td><td>97.0</td><td>65.0</td><td>78.0</td><td>79.5</td></tr>
+            <tr><td>DINO-WM</td><td>74.0</td><td>100.0</td><td>86.0</td><td>79.0</td><td>84.8</td></tr>
+            <tr><td>LeWM <span class="note">(our repro)</span></td><td><b>92.3</b></td><td>89.9</td><td>76.7</td><td>64.3</td><td>80.8</td></tr>
+            <tr class="ours"><td>Qantara (latent planning)</td><td>90.1</td><td>100.0</td><td><b>93.7</b></td><td><b>80.9</b></td><td><b>91.2</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Goal-conditioned planning success rate (%), mean over 3 training seeds; bold = unique
+      column-best. Qantara sets new SOTA on Cube (+7.7 over DINO-WM, +19.7 over LeWM) and Reacher (+1.9 over
+      DINO-WM), ties DINO-WM at 100.0 on Two-Room, and trails LeWM by 2.2 SR on Push-T. From the <i>same
+      weights</i>, the behaviour-cloning and video-inverse paths reach 82–83 SR on Push-T and 71–73 SR on Cube.</p>
+
+      <figure>
+        <img src="static/loss_curves.png" alt="State-bridge loss curves: edge-aligned training keeps seeds non-collapsed">
+        <figcaption><b>Edge-aligned sampling is what makes it work.</b> Replacing edge-concentrated noise sampling with
+        uniform interior sampling drops Push-T planning from <b>90.1 → 53.3 SR</b> at matched compute. Collapsed
+        seeds (orange) diverge on the state-bridge loss early in training; edge-aligned seeds (blue) track the
+        5-mode reference.</figcaption>
+      </figure>
+
+      <figure>
+        <video src="static/triptych_cube.mp4" autoplay loop muted playsinline
+               aria-label="OGBench-Cube: real trajectory next to three decoded latent rollouts from the same checkpoint"></video>
+        <figcaption><b>OGBench-Cube decoded rollouts</b> across the three inference paradigms from a shared
+        held-out context. PLAN/CLONE/INVERSE tiles are decoded latents, not env renders.</figcaption>
+      </figure>
+    </section>
+
+    <!-- BibTeX -->
+    <section id="bibtex">
+      <h2><span class="em">📚</span>Citation</h2>
+      <button style="margin:0 0 .5rem;padding:.35rem .8rem;font:inherit;font-size:.8rem;cursor:pointer;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;" onclick="navigator.clipboard.writeText(document.querySelector('pre.bib').innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy BibTeX',1200)})">Copy BibTeX</button>
+      <pre class="bib">@inproceedings{qantara2026,
+  title     = {Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control},
+  author    = {Rakhimov, Ruslan and Bredis, George and Maksyuta, Yuriy and Gavrilov, Daniil},
+  booktitle = {ICML 2026 Workshop on Decision-Making from Offline Datasets
+               to Online Adaptation: Black-Box Optimization to Reinforcement Learning},
+  year      = {2026},
+  eprint        = {2607.04978},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+  url       = {https://arxiv.org/abs/2607.04978}
+}</pre>
+    </section>
+
+    <!-- Acknowledgments -->
+    <section id="ack">
+      <h2><span class="em">🙏</span>Acknowledgments</h2>
+      <p>Built on top of <a href="https://github.com/lucas-maes/le-wm">Le-WM</a> and the
+      <code>stable_worldmodel</code> / <code>stable_pretraining</code> libraries.</p>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="wrap">
+      Qantara · <a href="https://github.com/corl-team/qantara">GitHub</a> ·
+      <a href="https://arxiv.org/abs/2607.04978">arXiv</a> ·
+      <a href="https://huggingface.co/t-tech/qantara-checkpoints">Hugging Face</a>
+    </div>
+  </footer>
+
+  <!-- Privacy-friendly visitor analytics (GoatCounter). Register the site code at
+       https://www.goatcounter.com/ ; if "qantara" is taken, swap the subdomain below. -->
+  <script data-goatcounter="https://qantara.goatcounter.com/count"
+          async src="https://gc.zgo.at/count.js"></script>
+
+  <script>
+    (function(){
+      var btn = document.getElementById('themeToggle');
+      var root = document.documentElement;
+      btn.addEventListener('click', function(){
+        var cur = root.getAttribute('data-theme');
+        if(!cur){
+          cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>
