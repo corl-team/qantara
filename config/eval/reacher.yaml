@@ -24,13 +24,17 @@ plan_config:
   receding_horizon: 5
   action_block: 5 # frameskip
 
+# Paper §A.2 L318: non-PushT envs use 10 CEM iters.
+solver:
+  n_steps: 10
+
 # evaluation from dataset (replay expert trajectories)
 eval:
   num_eval: 50
   goal_offset_steps: 25
   eval_budget: 50
   img_size: 224
-  dataset_name: dmc/reacher_random
+  dataset_name: reacher
   callables:
     # -- set state
     - method: set_state

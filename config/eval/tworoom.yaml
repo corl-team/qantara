@@ -24,6 +24,11 @@ plan_config:
   receding_horizon: 5
   action_block: 5 # frameskip
 
+# TwoRoom uses 10 CEM iterations (PushT uses 30). Budget/offset are 50/25, matching
+# cube/reacher.
+solver:
+  n_steps: 10
+
 # evaluation from dataset (replay expert trajectories)
 eval:
   num_eval: 50

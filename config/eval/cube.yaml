@@ -30,6 +30,10 @@ plan_config:
   receding_horizon: 5
   action_block: 5 # frameskip
 
+# Non-PushT envs use 10 CEM iterations.
+solver:
+  n_steps: 10
+
 # evaluation from dataset (replay expert trajectories)
 eval:
   num_eval: 50

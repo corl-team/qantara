@@ -1,0 +1,95 @@
+defaults:
+  - lewm
+  - _self_
+
+output_model_name: qantara
+
+# Qantara training config.
+# Recipe: 5 training modes (edge-aligned τ-pinning) + γ=1 Brownian bridge on z-axis
+# + (λ_z=3, λ_a=1) loss balance + nulldrop=0; AdamW with linear-warmup + cosine LR.
+# Inference defaults: CEM rollout_k=4, BC rollout_a_k=2, bc_kind=bc.
+optimizer:
+  lr: 3e-4
+  # Scheduler config. Overridable via Hydra:
+  #   optimizer.scheduler.warmup_steps=...   (overrides spt's 1% default)
+  # null sub-keys → spt smart-default for LinearWarmupCosineAnnealingLR fills them in
+  # (warmup_steps = max(1, 0.01 × estimated_stepping_batches), max_steps = total batches,
+  # warmup_start_lr = 0.0, eta_min = 0.0). train.py strips this dict before passing
+  # the rest of `optimizer` to AdamW so it doesn't leak into torch.optim kwargs.
+  scheduler:
+    type: LinearWarmupCosineAnnealingLR
+    warmup_steps: null
+    max_steps: null
+    warmup_start_lr: null
+    eta_min: null
+
+wm:
+  type: qantara
+  # Total transformer block window. Qantara predicts T = num_frames - 1 target blocks
+  # given 1 clean prefix block; only the sum matters (no history_size/num_preds split).
+  # Default falls back to lewm.yaml's history_size+num_preds = 3+1 = 4 if unset.
+  # State-axis x̂-recursion step count for CEM-style planning rollouts. K=1 is the
+  # single x-prediction call (exact along the chord at γ=0); K>1 iterates predict-x̂
+  # → re-project on the bridge with bridge-marginal noise at intermediate τ.
+  rollout_k: 4
+  # CFG scale w with null-action (zeros) proxy. 1.0 = off. w>1 doubles per-step
+  # forward passes (cond + null) — see module.py:rollout_z_step docstring.
+  rollout_guidance_w: 1.0
+  # Action-axis Euler v-integration step count for BC inference. Used directly when
+  # bc_kind=bc; under bc_kind=joint the same K drives joint Euler steps along the
+  # τ^a=τ^z diagonal (controls both axes).
+  rollout_a_k: 2
+  # Frame-spaced past context for BC inference: feeds rollout_a_step with
+  # z_hist of length K+1 + a_hist of length K, capped at num_frames-1 inside
+  # the model. Default = wm.history_size - 1 (= 2 for the inherited 3-frame
+  # history) so BC inference matches the frame-spaced context the model trained
+  # with; bc_past_frames=0 (single-frame BC) is OOD relative to training.
+  bc_past_frames: 2
+
+predictor:
+  dropout: 0.0
+  time_freq_dim: 256
+  # Enabled training modes; batch replicated M×. Disable unused modes to cut compute.
+  modes: [cem, bc, idm, video, joint]
+  # null-action dropout used by CFG inference. Default runs at rollout_guidance_w=1.0
+  # (CFG off); under CFG-off the dropout adds gradient noise to the cem-mode loss
+  # without benefit. Set >0 only when training specifically for rollout_guidance_w > 1.
+  null_action_drop_p: 0.0
+  # Bridge matching on z-axis (Stochastic Interpolant; Albergo et al., ICLR 2023). When True:
+  #   - Input:  z̃(τ_z) = (1−τ_z)·z_t + τ_z·z_{t+1}    (deterministic bridge — NO ε on z-axis)
+  #     At τ_z=0 input is z_t exactly (CEM inference locus); at τ_z=1 input is z_{t+1}.
+  #   - Output: x̂^z = z_t + head(h)                    (head outputs δ; zero-init → identity-at-init)
+  #   - Loss unchanged: ‖x̂^z − z_{t+1}‖² = ‖head(h) − (z_{t+1} − z_t)‖²
+  # CEM query at τ_z=0 receives z_t directly — eliminates the noise→data OOD gap that
+  # standard FM has (ε at τ_z=0 is OOD vs CEM rollout's clean-context query). K=1 is
+  # exact-by-construction (constant velocity along the linear bridge). a-axis remains
+  # standard FM with N(0,I) source for {bc, idm, video, joint} action denoising.
+  z_bridge: true
+  # Brownian-bridge γ on z-axis (only when z_bridge=true). 0.0 = deterministic linear
+  # bridge. >0 enables I²SB-style stochastic bridge: γ·√(τ(1−τ))·ε added to the linear
+  # interp. Endpoints (τ=0,1) remain noiseless → CEM/idm inference unchanged. Restores
+  # K>1 expressivity for stochastic-dynamics envs.
+  z_bridge_noise: 1.0
+  # Bridge-head parameterization (only when z_bridge=true). True (default): δ-head with
+  # zero-init last layer → identity-at-init via residual x̂ = z_t + δ̂ (on-manifold prior).
+  # False: head outputs x̂ directly with default Linear init; ablates the residual structural
+  # prior. Loss + inference both gated identically (must match training-time choice).
+  z_delta: true
+  # τ-chain shape over T target blocks.
+  #   monotone (default) — cumprod chain (Rolling Forcing / PA-VDM); τ monotone-decreasing.
+  #   independent        — per-block independent draws (no cumprod); ablates the monotone
+  #                        inductive bias.
+  tau_chain: monotone
+
+loss:
+  fm_z:
+    # State-axis FM loss weight (λ_z). The (λ_z, λ_a) trade-off basin is asymmetric:
+    # very small λ_z under-trains z-prediction and degrades Push-T sharply; very large
+    # λ_z mildly degrades the suite average. λ_z=3 sits inside the basin.
+    weight: 3.0
+  fm_a:
+    weight: 1.0
+    # Drop τ_a=1 positions from the FM_a loss. At τ_a=1, target = a_t − ε_a is irreducibly
+    # stochastic in ε_a, leaving a per-sample gradient noise floor that would propagate
+    # through the shared trunk.
+    mask_tau1: true

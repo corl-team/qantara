@@ -1,3 +1,5 @@
+eval_config: reacher
+
 dataset:
   num_steps: ${eval:'${wm.num_preds} + ${wm.history_size}'}
   frameskip: 5

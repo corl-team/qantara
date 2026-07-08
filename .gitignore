@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.ruff_cache/
+.pytest_cache/
+
+# Environments
+.venv/
+.env
+
+# Training / eval outputs
+outputs/
+wandb/
+logs/
+lightning_logs/
+metrics/
+figs/
+plots/
+tables/
+
+# Checkpoints / datasets (kept under $STABLEWM_HOME, outside the repo)
+*.ckpt
+*.pt
+*.h5
+
+# OS
+.DS_Store

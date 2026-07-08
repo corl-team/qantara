@@ -1,0 +1,29 @@
+[project]
+name = "qantara"
+version = "0.1.0"
+description = "Qantara: a JEPA world model for goal-conditioned planning from pixels and actions"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "datasets>=3.0",
+    "stable-pretraining==0.1.6",
+    "stable-worldmodel[env,train]>=0.0.6",
+    "torch>=2.7,<2.8",
+    "torchvision>=0.22,<0.23",
+    "clearml>=1.16",
+    "huggingface-hub[cli]>=1.8.0",
+    "shimmy[dm-control]>=2.0",
+    "mujoco==3.2.0",
+    "dm-control==1.0.21",
+    "tensorboard>=2.20.0",
+]
+
+[tool.uv]
+# stable-worldmodel[env] requires stable-baselines3 unpinned; the legacy <2.0 line
+# depends on gym==0.21 (no PyPI wheel, broken sdist build). Pin to the modern,
+# gymnasium-based line so PyPI resolution succeeds.
+constraint-dependencies = ["stable-baselines3>=2.0"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

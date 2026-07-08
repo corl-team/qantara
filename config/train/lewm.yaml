@@ -1,30 +1,45 @@
 defaults:
   - _self_
   - data: pusht
+  - override hydra/job_logging: disabled   # no {run.dir}/train.log
 
 output_model_name: lewm
 subdir: ${hydra:job.id}
+resume: null
 
-num_workers: 6
-train_split: 0.9
+# train.py ignores Hydra's run.dir (builds its own from `subdir`). Disable the filesystem
+# side-effects so outputs/{job}/ isn't cluttered by duplicate .hydra/ config dumps.
+hydra:
+  output_subdir: null   # no .hydra/{config,hydra,overrides}.yaml
+  run:
+    dir: .              # no timestamped YYYY-MM-DD/HH-MM-SS/ dir
+
+num_workers: 12
+train_split: 1.0
 seed: 3072
 img_size: 224
 patch_size: 14
 encoder_scale: tiny
+# `vit` (default) = from-scratch HF ViT (encoder_scale + patch_size). `dinov2_s` =
+# frozen pretrained DINOv2-S/14 ablation (require wm.embed_dim=384, loss.sigreg.weight=0).
+encoder_kind: vit
 dump_object: True
 
 trainer:
-  max_epochs: 100
+  max_epochs: 10
   devices: auto
   accelerator: gpu
+  strategy: auto
   precision: bf16
   gradient_clip_val: 1.0
+  sync_batchnorm: false
+  log_every_n_steps: 200
 
 loader:
   batch_size: 128
   num_workers: ${num_workers}
-  persistent_workers: True
-  prefetch_factor: 3
+  persistent_workers: False
+  prefetch_factor: 6
   pin_memory: True
 
 optimizer:
@@ -33,7 +48,7 @@ optimizer:
   weight_decay: 1e-3
 
 wandb:
-  enabled: True
+  enabled: False
   config:
     entity: lewm
     project: lewm
@@ -41,6 +56,11 @@ wandb:
     id: ${subdir}
     resume: allow
     log_model: False
+
+clearml:
+  enabled: False
+  project: ${oc.env:PROJECT_NAME}
+  task: ${subdir}
 
 wm:
   type: lewm
@@ -56,9 +76,28 @@ predictor:
   dropout: 0.1
   emb_dropout: 0.0
 
+# Pixel decoder (optional). weight=0 → head not built.
+decoder:
+  base_channels: 128
+  detach: true
+  log_images_every: 5000
+
 loss:
   sigreg:
     weight: 0.09
     kwargs:
       knots: 17
       num_proj: 1024
+  decoder:
+    weight: 1.0
+
+eval_during_train:
+  enabled: False
+  config_name: null       # env selector: pusht | tworoom | cube | reacher
+  every_n_epochs: 1
+  num_eval: null
+  task: null              # parametric per-env eval configs read `task` here
+  solver:
+    n_steps: null
+    num_samples: null
+    topk: null

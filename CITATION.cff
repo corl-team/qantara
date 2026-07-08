@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this code or its ideas, please cite the paper below."
+title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control"
+abstract: >-
+  An end-to-end JEPA world model whose joint training objective pairs a
+  Brownian-bridge interpolant on the state axis with noise-to-data flow matching
+  on the action axis. A single checkpoint serves three inference paradigms without
+  retraining: latent planning, behaviour-cloning action sampling, and video-inverse
+  dynamics.
+license: MIT
+url: "https://arxiv.org/abs/2607.04978"
+repository-code: "https://github.com/corl-team/qantara"
+authors:
+  - family-names: Rakhimov
+    given-names: Ruslan
+  - family-names: Bredis
+    given-names: George
+  - family-names: Maksyuta
+    given-names: Yuriy
+  - family-names: Gavrilov
+    given-names: Daniil
+preferred-citation:
+  type: conference-paper
+  title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control"
+  authors:
+    - family-names: Rakhimov
+      given-names: Ruslan
+    - family-names: Bredis
+      given-names: George
+    - family-names: Maksyuta
+      given-names: Yuriy
+    - family-names: Gavrilov
+      given-names: Daniil
+  collection-title: >-
+    ICML 2026 Workshop on Decision-Making from Offline Datasets to Online
+    Adaptation: Black-Box Optimization to Reinforcement Learning (DEMO)
+  year: 2026
+  url: "https://arxiv.org/abs/2607.04978"

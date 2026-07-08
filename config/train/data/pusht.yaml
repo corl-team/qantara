@@ -1,3 +1,5 @@
+eval_config: pusht  # default config/eval/<name>.yaml for in-train planning eval
+
 dataset:
   num_steps: ${eval:'${wm.num_preds} + ${wm.history_size}'}
   frameskip: 5
