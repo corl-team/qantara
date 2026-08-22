@@ -4,20 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control</title>
-  <meta name="description" content="Qantara: one JEPA checkpoint that serves latent planning, behaviour cloning, and inverse dynamics. 91.2 SR on the LeWM control suite, new SOTA on OGBench-Cube. ICML 2026 DEMO Workshop.">
+  <meta name="description" content="Qantara: one JEPA checkpoint that serves latent planning, behaviour cloning, and inverse dynamics. 91.2 SR on the LeWM control suite, 93.7 on OGBench-Cube. ICML 2026 DEMO Workshop.">
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Qantara: Multi-Paradigm JEPA Control">
-  <meta property="og:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta property="og:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; 93.7 on OGBench-Cube.">
   <meta property="og:url" content="https://corl-team.github.io/qantara/">
   <meta property="og:image" content="https://corl-team.github.io/qantara/static/social.png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="Qantara: one JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta property="og:image:alt" content="Qantara: one JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; 93.7 on OGBench-Cube.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Qantara: Multi-Paradigm JEPA Control">
-  <meta name="twitter:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; new SOTA on OGBench-Cube.">
+  <meta name="twitter:description" content="One JEPA checkpoint, three inference paradigms. 91.2 SR on the LeWM control suite; 93.7 on OGBench-Cube.">
   <meta name="twitter:image" content="https://corl-team.github.io/qantara/static/social.png">
   <meta name="twitter:image:alt" content="Qantara: one JEPA checkpoint, three inference paradigms.">
 
@@ -199,8 +199,9 @@
       predicts the next latent without action conditioning, then extracts the action. Training concentrates mass
       on the edges of the (action-time, state-time) noise square, where inference queries the predictor: replacing
       it with uniform interior sampling drops Push-T planning from 90.1 to 53.3 SR at matched compute. On the LeWM
-      control suite, Qantara reaches a 91.2 SR three-train-seed average and sets new SOTA on OGBench-Cube (+7.7 SR
-      over DINO-WM, +19.7 over LeWM). From the same weights, the behaviour-cloning and video–inverse paths reach
+      control suite, Qantara reaches a 91.2 SR three-train-seed average and 93.7 SR on OGBench-Cube (+7.7 over
+      DINO-WM as re-evaluated by the suite authors, +19.7 over LeWM). From the same weights, the
+      behaviour-cloning and video–inverse paths reach
       82–83 SR on Push-T and 71–73 SR on Cube. These results move JEPA world models from single-paradigm planners
       to multi-paradigm controllers.</p>
     </section>
@@ -272,7 +273,7 @@
         </table>
       </div>
       <p class="note">Goal-conditioned planning success rate (%), mean over 3 training seeds; bold = unique
-      column-best. Qantara sets new SOTA on Cube (+7.7 over DINO-WM, +19.7 over LeWM) and Reacher (+1.9 over
+      column-best. Qantara takes that column on Cube (+7.7 over DINO-WM, +19.7 over LeWM) and Reacher (+1.9 over
       DINO-WM), ties DINO-WM at 100.0 on Two-Room, and trails LeWM by 2.2 SR on Push-T. From the <i>same
       weights</i>, the behaviour-cloning and video-inverse paths reach 82–83 SR on Push-T and 71–73 SR on Cube.</p>
 
@@ -296,12 +297,12 @@
     <section id="bibtex">
       <h2><span class="em">📚</span>Citation</h2>
       <button style="margin:0 0 .5rem;padding:.35rem .8rem;font:inherit;font-size:.8rem;cursor:pointer;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;" onclick="navigator.clipboard.writeText(document.querySelector('pre.bib').innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy BibTeX',1200)})">Copy BibTeX</button>
-      <pre class="bib">@inproceedings{qantara2026,
+      <pre class="bib">@misc{qantara2026,
   title     = {Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control},
   author    = {Rakhimov, Ruslan and Bredis, George and Maksyuta, Yuriy and Gavrilov, Daniil},
-  booktitle = {ICML 2026 Workshop on Decision-Making from Offline Datasets
-               to Online Adaptation: Black-Box Optimization to Reinforcement Learning},
   year      = {2026},
+  note      = {ICML 2026 Workshop on Decision-Making from Offline Datasets to
+               Online Adaptation (DEMO); non-archival},
   eprint        = {2607.04978},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG},
