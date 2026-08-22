@@ -20,7 +20,7 @@ authors:
   - family-names: Gavrilov
     given-names: Daniil
 preferred-citation:
-  type: conference-paper
+  type: article
   title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control"
   authors:
     - family-names: Rakhimov
@@ -31,8 +31,9 @@ preferred-citation:
       given-names: Yuriy
     - family-names: Gavrilov
       given-names: Daniil
-  collection-title: >-
-    ICML 2026 Workshop on Decision-Making from Offline Datasets to Online
-    Adaptation: Black-Box Optimization to Reinforcement Learning (DEMO)
+  journal: "arXiv"
+  notes: >-
+    Presented at the ICML 2026 Workshop on Decision-Making from Offline Datasets
+    to Online Adaptation (DEMO), which is non-archival and has no proceedings.
   year: 2026
   url: "https://arxiv.org/abs/2607.04978"
