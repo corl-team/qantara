@@ -42,11 +42,11 @@ paths were substantially modified for this work.
 If you use this code or the released checkpoints, please cite:
 
 ```bibtex
-@inproceedings{qantara2026,
+@misc{qantara2026,
   title     = {Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control},
   author    = {Rakhimov, Ruslan and Bredis, George and Maksyuta, Yuriy and Gavrilov, Daniil},
-  booktitle = {ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation: Black-Box Optimization to Reinforcement Learning},
   year      = {2026},
+  note      = {ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO); non-archival},
   eprint    = {2607.04978},
   archivePrefix = {arXiv},
   primaryClass = {cs.LG},
