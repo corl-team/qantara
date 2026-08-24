@@ -5,7 +5,7 @@
 # Qantara
 ### Bridge-Flow Training for Multi-Paradigm JEPA Control
 
-Ruslan Rakhimov, George Bredis, Yuriy Maksyuta, Daniil Gavrilov
+[Ruslan Rakhimov](https://github.com/rakhimovv), [George Bredis](https://github.com/Natyren), [Yuriy Maksyuta](https://github.com/ex7remum), [Daniil Gavrilov](https://github.com/kefirski)
 
 *ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO)*
 
