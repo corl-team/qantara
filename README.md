@@ -5,7 +5,7 @@
 # Qantara
 ### Bridge-Flow Training for Multi-Paradigm JEPA Control
 
-Ruslan Rakhimov, George Bredis, Yuriy Maksyuta, Daniil Gavrilov
+[Ruslan Rakhimov](https://github.com/rakhimovv), [George Bredis](https://github.com/Natyren), [Yuriy Maksyuta](https://github.com/ex7remum), [Daniil Gavrilov](https://github.com/kefirski)
 
 *ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO)*
 
@@ -22,8 +22,9 @@ inverse dynamics, which we query through a video–inverse composition that firs
 latent without action conditioning, then extracts the action. Training concentrates mass on the
 edges of the (action-time, state-time) noise square, where inference queries the predictor:
 replacing it with uniform interior sampling drops Push-T planning from 90.1 to 53.3 SR at matched
-compute. On the LeWM control suite, Qantara reaches a 91.2 SR three-train-seed average and sets
-new SOTA on OGBench-Cube (+7.7 SR over DINO-WM, +19.7 over LeWM). From the same weights, the
+compute. On the LeWM control suite, Qantara reaches a 91.2 SR three-train-seed average and
+93.7 SR on OGBench-Cube (+7.7 over DINO-WM as re-evaluated by the suite authors, +19.7 over
+LeWM). From the same weights, the
 behaviour-cloning and video–inverse paths reach 82–83 SR on Push-T and 71–73 SR on Cube. These
 results move JEPA world models from single-paradigm planners to multi-paradigm controllers.
 
