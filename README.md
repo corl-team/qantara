@@ -3,30 +3,33 @@
 </p>
 
 # Qantara
-### Bridge-Flow Training for Multi-Paradigm JEPA Control
+### Bridge-Flow Training for Multi-Paradigm JEPA Inference
 
 [Ruslan Rakhimov](https://github.com/rakhimovv), [George Bredis](https://github.com/Natyren), [Yuriy Maksyuta](https://github.com/ex7remum), [Daniil Gavrilov](https://github.com/kefirski)
 
 *ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO)*
 
 **Abstract:** Joint-Embedding Predictive Architectures (JEPAs) underpin a growing family of
-latent world models for control from raw pixels, but every existing JEPA world model commits
-at training time to a single inference paradigm: either trajectory optimisation in a learned
-dynamics model, or direct behaviour cloning. A single checkpoint that serves both would defer
-this choice to inference, when deployment constraints (rollout cost, observation accessibility)
-determine which path wins. We present **Qantara**, an end-to-end JEPA whose joint training
-objective pairs a Brownian-bridge interpolant between consecutive clean latents on the state
-axis with noise-to-data flow matching on the action axis. The same checkpoint serves three
-inference paradigms without retraining: latent planning, behaviour-cloning action sampling, and
-inverse dynamics, which we query through a video–inverse composition that first predicts the next
-latent without action conditioning, then extracts the action. Training concentrates mass on the
-edges of the (action-time, state-time) noise square, where inference queries the predictor:
-replacing it with uniform interior sampling drops Push-T planning from 90.1 to 53.3 SR at matched
-compute. On the LeWM control suite, Qantara reaches a 91.2 SR three-train-seed average and
-93.7 SR on OGBench-Cube (+7.7 over DINO-WM as re-evaluated by the suite authors, +19.7 over
-LeWM). From the same weights, the
-behaviour-cloning and video–inverse paths reach 82–83 SR on Push-T and 71–73 SR on Cube. These
-results move JEPA world models from single-paradigm planners to multi-paradigm controllers.
+latent world models for control from raw pixels. Published JEPA world models for pixel-based
+control (PLDM, DINO-WM, LeWM, V-JEPA-2-AC) each commit at training time to a single inference
+paradigm, trajectory optimisation in a learned dynamics model, so a checkpoint trained to plan
+cannot be read off as a policy without retraining. Deferring that choice to inference would let
+the constraints that bind at deployment, per-step latency and whether a goal observation can be
+supplied, pick the path. We present **Qantara**, an end-to-end JEPA of about 21M parameters
+whose joint training objective pairs a Brownian-bridge interpolant between consecutive clean
+latents on the state axis with noise-to-data flow matching on the action axis. One checkpoint
+serves three inference paradigms without retraining: latent planning, behaviour-cloning action
+sampling, and a video-inverse composition that predicts the next latent without action
+conditioning, then recovers the action bridging the two. Training samples the two noise levels
+along the edges of the (action-noise, state-noise) square, one edge per inference dispatch, so
+each path is trained where it is queried. Replacing that sampler with uniform sampling over the
+square at matched compute drops Push-T planning from 90.1 to 53.3 success rate (SR). On the LeWM
+control suite at a matched 10-epoch budget, Qantara averages 91.2 SR over the four environments
+and reaches 93.7 on OGBench-Cube, +7.7 over DINO-WM and +17.0 over LeWM, each measured against
+the stronger of that baseline's published score and our retrain of it. From the same weights the
+two goal-blind paths, which receive no goal image, reach 82.1-83.2 SR on Push-T and 70.8-72.8 on
+Cube at roughly 15-65x lower inference cost, and fall to near-noise on Reacher, whose released
+training corpus comes from a random policy.
 
 <p align="center">
    <b>[ 📄 <a href="https://arxiv.org/abs/2607.04978">Paper</a> | 🤗 <a href="https://huggingface.co/papers/2607.04978">HF Paper</a> | 🌐 <a href="https://corl-team.github.io/qantara/">Website</a> | 🤗 <a href="https://huggingface.co/t-tech/qantara-checkpoints">Checkpoints</a> | 🧵 <a href="https://x.com/rusrakhimov/status/2074847486288806306">Thread</a> ]</b>
@@ -44,7 +47,7 @@ If you use this code or the released checkpoints, please cite:
 
 ```bibtex
 @misc{qantara2026,
-  title     = {Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control},
+  title     = {Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Inference},
   author    = {Rakhimov, Ruslan and Bredis, George and Maksyuta, Yuriy and Gavrilov, Daniil},
   year      = {2026},
   note      = {ICML 2026 Workshop on Decision-Making from Offline Datasets to Online Adaptation (DEMO); non-archival},

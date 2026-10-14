@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this code or its ideas, please cite the paper below."
-title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control"
+title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Inference"
 abstract: >-
   An end-to-end JEPA world model whose joint training objective pairs a
   Brownian-bridge interpolant on the state axis with noise-to-data flow matching
@@ -21,7 +21,7 @@ authors:
     given-names: Daniil
 preferred-citation:
   type: article
-  title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Control"
+  title: "Qantara: Bridge-Flow Training for Multi-Paradigm JEPA Inference"
   authors:
     - family-names: Rakhimov
       given-names: Ruslan
